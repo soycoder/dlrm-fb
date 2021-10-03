@@ -20,4 +20,4 @@ cd "${SRC_DIR}/ucx"
 make -j install
 echo "${UCX_INSTALL_DIR}/lib" > /etc/ld.so.conf.d/ucx.conf
 ldconfig
-ldconfig -p | grep -i ucx | cat
+ldconfig -p | grep -i ucx
