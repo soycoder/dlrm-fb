@@ -7,23 +7,23 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
 
 %post
     #==============================================================================
-    SRC_DIR=/root/DLRM
+    export SRC_DIR=/tools
     BIN_DIR=/opt
     # 
-    CUDA_HOME=/usr/local/cuda
+    export CUDA_HOME=/usr/local/cuda
     # 
     UCX_GITHUB_URL=https://github.com/openucx/ucx.git
     UCX_BRANCH=master
-    UCX_INSTALL_DIR=${BIN_DIR}/ucx
+    export UCX_INSTALL_DIR=${BIN_DIR}/ucx
     UCX_BUILD_TYPE=release-mt
     # 
     UCC_GITHUB_URL=https://github.com/openucx/ucc.git
     UCC_BRANCH=master
-    UCC_INSTALL_DIR=${BIN_DIR}/ucc
+    export UCC_INSTALL_DIR=${BIN_DIR}/ucc
     # 
     TORCH_UCC_GITHUB_URL=https://github.com/facebookresearch/torch_ucc.git
     TORCH_UCC_BRANCH=main
-    TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
+    export TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
     # 
     WORKLOADS_DIR=${BIN_DIR}/workloads
 
@@ -42,6 +42,8 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     rdma-core-devel \
     nano \
     wget
+
+    dnf --enablerepo=powertools -y install doxygen
 
     # Remove old UCX
     rpm -e --nodeps ucx
@@ -79,19 +81,23 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     cd ${SRC_DIR}/ucc && \
     git checkout ${UCC_BRANCH}
 
+    git clone https://github.com/soycoder/dlrm-fb.git ${SRC_DIR}/devel && \
+    cd ${SRC_DIR}/devel && \
+    git checkout devel
+
     #==============================================================================
     # Build UCX
-    ${SRC_DIR}/script/build_ucx.sh
+    ${SRC_DIR}/devel/script/build_ucx.sh
     PATH=${UCX_INSTALL_DIR}/bin:${PATH}
     #==============================================================================
     # Configure Python
     # ${SRC_DIR}/scripts/configure_python.sh
     #==============================================================================
     # Build UCC
-    ${SRC_DIR}/scripts/build_ucc.sh
+    ${SRC_DIR}/devel/scripts/build_ucc.sh
     #==============================================================================
     # Install PyTorch
-    ${SRC_DIR}/scripts/install_torch.sh
+    ${SRC_DIR}/devel/scripts/install_torch.sh
     #==============================================================================
 
     #==============================================================================
@@ -106,20 +112,20 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
 
     #==============================================================================
     # Install torch_ucc (UCC version) python module and build a wheel package
-    ${SRC_DIR}/scripts/install_torch_ucc.sh
+    ${SRC_DIR}/devel/scripts/install_torch_ucc.sh
 
     #============================================================================
 
     # Run UCC tests
     echo "INFO: Run UCC tests"
     hostname
-    ${SRC_DIR}/scripts/run_tests_ucc.sh
+    ${SRC_DIR}/devel/scripts/run_tests_ucc.sh
     #============================================================================
 
     # Run Torch-UCC tests (UCC)
     echo "INFO: Run Torch-UCC tests (UCC)"
     hostname
-    ${SRC_DIR}/scripts/run_tests_torch_ucc.sh
+    ${SRC_DIR}/devel/scripts/run_tests_torch_ucc.sh
 
     #============================================================================
   
