@@ -1,0 +1,75 @@
+Bootstrap: localimage
+From: /root/DLRM/dlrm-ct8.3-cu101-dep.sif
+
+# COMMAND BUILD 
+# sudo singularity build dlrm-ct8.3-cu101-hpcai.sif /root/DLRM/dlrm-ct8.3-hpcai.def
+
+%post
+    mkdir -p /tools/dlrm/code
+    export PATH=/opt/cmake/bin:/usr/local/ompi/bin:/opt/ucc/bin:${PATH}
+    export LD_LIBRARY_PATH=/opt/ucc/lib:${LD_LIBRARY_PATH}
+
+    # Set ENV
+    DLRM_LINK=https://github.com/facebookresearch/dlrm.git
+    TORCH_UCC_LINK=https://github.com/facebookresearch/torch_ucc.git
+
+    # ME
+    TORCH_UCC_COMMIT=18fc9a1ca2f6ec4d5924922b89c09e68a86d904b
+
+    # Benchmark Guidelines
+    PYTORCH_COMMIT=1a64a5c0ba895f57fa810d80a6a8b9f11f24b848
+    # TORCH_UCC_COMMIT=966bd2b643dc9d2119edcfe45e7afbe47cdbe478
+    TORCH_DLRM_COMMIT=f486cea79e1f209d3e2cfde5c1261468e0993c67
+
+    # Configure Python
+    pip install --prefix=/usr/local --upgrade  setuptools wheel 
+
+    #======================= Install PyTorch ===========================
+
+    # pip install --prefix=/usr/local  --no-cache-dir --default-timeout=900 --pre torch -f https://download.pytorch.org/whl/nightly/cu111/torch_nightly.html 
+    pip install --prefix=/usr/local --no-cache-dir torch==1.8.0+cu101 torchvision==0.9.0+cu101 torchaudio==0.8.0 -f https://download.pytorch.org/whl/torch_stable.html
+    pip install --prefix=/usr/local  "git+https://github.com/mlperf/logging.git@0.7.1" 
+
+    #======================= Install DLRM ===========================
+    git clone ${DLRM_LINK} /tools/dlrm/code
+
+    cd /tools/dlrm/code && \
+    git checkout ${TORCH_DLRM_COMMIT} && \
+    pip install --prefix=/usr/local  --no-cache-dir -r /tools/dlrm/code/requirements.txt 
+    pip install --prefix=/usr/local  tensorboard 
+    
+    #==================== Install Torch-UCC =========================
+    git clone ${TORCH_UCC_LINK} /torch_ucc 
+
+    cd /torch_ucc && \
+    git checkout ${TORCH_UCC_COMMIT}
+
+    TORCH_UCC_ALLGATHER_BLOCKING_WAIT=1
+    TORCH_UCC_ALLREDUCE_BLOCKING_WAIT=1
+    TORCH_UCC_ALLTOALL_BLOCKING_WAIT=1
+    TORCH_UCC_BCAST_BLOCKING_WAIT=1
+
+    export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/cuda-10.2/targets/x86_64-linux/include/
+
+    cd /torch_ucc && \
+    UCX_HOME=/usr \
+    UCC_HOME=/opt/ucc \
+    WITH_CUDA=/usr/local/cuda \
+    python setup.py install --prefix=/usr/local
+
+    # test library
+    # python -c 'import torch, torch_ucc'
+    
+
+    # Remove tools
+    rm -rf /tools/dlrm
+
+    # 
+    # cd /torch_ucc && \
+    # wget https://raw.githubusercontent.com/soycoder/dlrm/main/torch_ucc/torch_test.sh && \
+    # chmod +x torch_test.sh
+
+# %test
+#     export LD_LIBRARY_PATH=/opt/ucx/lib:/opt/ucc/lib:${LD_LIBRARY_PATH}
+#     /torch_ucc/torch_test.sh
+    

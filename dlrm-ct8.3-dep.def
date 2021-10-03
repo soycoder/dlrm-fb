@@ -1,0 +1,97 @@
+Bootstrap: localimage
+From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
+
+# COMMAND BUILD 
+# sudo singularity build dlrm-ct8.3-cu101-dep.sif /root/DLRM/dlrm-ct8.3-dep.def
+
+%environment
+    export PATH=/usr/local/ompi/bin:/opt/ucx/bin:/opt/ucc/bin:${PATH}
+    export LD_LIBRARY_PATH=/usr/local/ompi/lib:/opt/ucx/lib64:/opt/ucc/lib:${LD_LIBRARY_PATH}
+
+%post
+
+    dnf --enablerepo=powertools -y install doxygen
+
+    mkdir -p /tmp/dlrm
+
+    # Set ENV
+    OPENUCX_LINK=https://github.com/openucx/ucx.git
+    UCC_LINK=https://github.com/openucx/ucc.git
+    OMPI_LINK=https://github.com/open-mpi/ompi.git
+    GDRCOPY_LINK=https://github.com/NVIDIA/gdrcopy.git
+
+    UCC_COMMIT=1a2da2a3baf47b16534d4bc31defaa0d522a246d
+    GDRCOPY_COMMIT=75f24806239b6e481240e517fdb022f26b90ab0b
+
+    # export PATH=/usr/local/cuda/bin:${PATH}
+    # export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+
+    #======================= Install GPUDirect RDMA Copy ===========================
+    # dnf install http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-1.noarch.rpm
+    dnf -y install check-devel
+    cd /tmp/dlrm && \
+    wget https://download-ib01.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/e/epel-release-8-13.el8.noarch.rpm && \
+    rpm -Uvh epel-release-8-13.el8.noarch.rpm
+    dnf -y install dkms
+    # subunit subunit-devel
+
+    git clone ${GDRCOPY_LINK} /tmp/dlrm/gdrcopy && \
+    cd /tmp/dlrm/gdrcopy && \
+    git checkout ${GDRCOPY_COMMIT} && \
+    cd /tmp/dlrm/gdrcopy/packages && \
+    CUDA=/usr/local/cuda ./build-rpm-packages.sh && \
+    rpm -Uvh gdrcopy-kmod-2.3-1dkms.noarch.el8.rpm && \
+    rpm -Uvh gdrcopy-2.3-1.x86_64.el8.rpm && \
+    rpm -Uvh gdrcopy-devel-2.3-1.noarch.el8.rpm
+
+
+
+    #======================= Install OpenUCX ===========================
+    
+    ## Install OpenUCX - UCX --branch v1.11.1 
+    mkdir -p /log-file
+    UCX_LOG_FILE=/log-file/ucx.log
+    
+    git clone ${OPENUCX_LINK} /tmp/dlrm/ucx && \
+    cd /tmp/dlrm/ucx && \
+    git checkout v1.11.1 && \
+    ./autogen.sh && \
+    ./contrib/configure-release --build=x86_64-redhat-linux-gnu \
+    --host=x86_64-redhat-linux-gnu \
+    --program-prefix= --disable-dependency-tracking \
+    --prefix=/opt/ucx --exec-prefix=/opt/ucx --bindir=/opt/ucx/bin \
+    --sbindir=/opt/ucx/sbin --sysconfdir=/etc --datadir=/opt/ucx/share \
+    --includedir=/opt/ucx/include --libdir=/opt/ucx/lib64 \
+    --libexecdir=/opt/ucx/libexec --localstatedir=/var \
+    --sharedstatedir=/var/lib --mandir=/opt/ucx/share/man \
+    --infodir=/opt/ucx/share/info --disable-optimizations \
+    --enable-mt  --enable-cma --with-cuda --with-gdrcopy \
+    --with-verbs --with-cm --with-knem --with-rdmacm \
+    --without-rocm --without-xpmem --without-ugni \
+    --without-java --with-cuda=/usr/local/cuda && \
+    make -j install
+
+    ## Install OpenUCX - UCC
+    git clone --recursive ${UCC_LINK} /tmp/dlrm/ucc && \
+    cd /tmp/dlrm/ucc && \
+    git checkout ${UCC_COMMIT} && \
+    ./autogen.sh && \
+    ./configure --prefix=/opt/ucc --with-ucx=/usr --with-cuda=/usr/local/cuda && \
+    make -j install
+
+
+    #==================== Install Open MPI ======================
+    #  NOTE With OpenMPI 4.0 and above, there could be compilation errors from "btl_uct" component. 
+    #  This component is not critical for using UCX; so it could be disabled this way:
+    #  Ref: https://github.com/openucx/ucx/wiki/OpenMPI-and-OpenSHMEM-installation-with-UCX#running-open-mpi-with-ucx
+    git clone --branch v4.1.1 ${OMPI_LINK} /tmp/dlrm/ompi && \
+    cd /tmp/dlrm/ompi && \
+    ./autogen.pl; \
+    ./configure --prefix=/usr/local/ompi \
+    --with-ucx=/usr \
+    --with-ucx-libdir=/usr/lib64 \
+    --with-cuda=/usr/local/cuda; \
+    make -j install
+
+    # Remove tools
+    rm -rf /tmp/dlrm

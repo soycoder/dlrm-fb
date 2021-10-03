@@ -1,0 +1,133 @@
+Bootstrap: localimage
+From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
+
+# COMMAND BUILD 
+# $ sudo singularity build dlrm-ct8.3-cu101-torch-ucc.sif /root/DLRM/dlrm-ct8.3-cu101-torch-ucc.def
+
+
+%post
+    #==============================================================================
+    SRC_DIR=/root/DLRM
+    BIN_DIR=/opt
+    # 
+    CUDA_HOME=/usr/local/cuda
+    # 
+    UCX_GITHUB_URL=https://github.com/openucx/ucx.git
+    UCX_BRANCH=master
+    UCX_INSTALL_DIR=${BIN_DIR}/ucx
+    UCX_BUILD_TYPE=release-mt
+    # 
+    UCC_GITHUB_URL=https://github.com/openucx/ucc.git
+    UCC_BRANCH=master
+    UCC_INSTALL_DIR=${BIN_DIR}/ucc
+    # 
+    TORCH_UCC_GITHUB_URL=https://github.com/facebookresearch/torch_ucc.git
+    TORCH_UCC_BRANCH=main
+    TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
+    # 
+    WORKLOADS_DIR=${BIN_DIR}/workloads
+
+    #==============================================================================
+    yum groupinstall -y 'Development Tools' \
+    # 'Infiniband Support'
+    yum config-manager --set-enabled powertools && yum install -y --skip-broken \
+    numactl \
+    numactl-devel \
+    openmpi \
+    openmpi-devel \
+    openssh-server \
+    protobuf-compiler \
+    protobuf-devel \
+    python36-devel \
+    rdma-core-devel \
+    nano \
+    wget
+
+    # Remove old UCX
+    rpm -e --nodeps ucx
+
+    PATH=/usr/lib64/openmpi/bin:$PATH
+    echo "export PATH=\"/usr/lib64/openmpi/bin:\$PATH\"" >> /etc/bashrc && \
+    export LD_LIBRARY_PATH=\"/usr/lib64/openmpi/lib:\${LD_LIBRARY_PATH}\" >> /etc/bashrc
+
+    # Install CMake
+    cd /tmp && wget https://github.com/Kitware/CMake/releases/download/v3.20.4/cmake-3.20.4-linux-x86_64.sh && \
+    chmod +x /tmp/cmake-3.20.4-linux-x86_64.sh && /tmp/cmake-3.20.4-linux-x86_64.sh --skip-license --prefix=/usr && \
+    rm -f /tmp/cmake-3.20.4-linux-x86_64.sh
+
+    #==============================================================================
+    # Configure SSH
+    mkdir -p /var/run/sshd && \
+    cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \
+    echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
+    mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config && \
+    ssh-keygen -A &&  \
+    rm -f /run/nologin
+
+    #==============================================================================
+    git clone ${TORCH_UCC_GITHUB_URL} ${SRC_DIR}/torch_ucc/ && \
+    cd ${SRC_DIR}/torch_ucc && \
+    git checkout ${TORCH_UCC_BRANCH}
+
+    mkdir -p ${SRC_DIR}/ucx && \
+    git clone --recursive ${UCX_GITHUB_URL} ${SRC_DIR}/ucx && \
+    cd ${SRC_DIR}/ucx && \
+    git checkout ${UCX_BRANCH}
+
+    mkdir -p ${SRC_DIR}/ucc && \
+    git clone --recursive ${UCC_GITHUB_URL} ${SRC_DIR}/ucc && \
+    cd ${SRC_DIR}/ucc && \
+    git checkout ${UCC_BRANCH}
+
+    #==============================================================================
+    # Build UCX
+    ${SRC_DIR}/script/build_ucx.sh
+    PATH=${UCX_INSTALL_DIR}/bin:${PATH}
+    #==============================================================================
+    # Configure Python
+    # ${SRC_DIR}/scripts/configure_python.sh
+    #==============================================================================
+    # Build UCC
+    ${SRC_DIR}/scripts/build_ucc.sh
+    #==============================================================================
+    # Install PyTorch
+    ${SRC_DIR}/scripts/install_torch.sh
+    #==============================================================================
+
+    #==============================================================================
+    # Install workloads
+    cd ${WORKLOADS_DIR} && \
+    git clone https://github.com/facebookresearch/dlrm.git && \
+    cd ${WORKLOADS_DIR}/dlrm && \
+    pip install -r ${WORKLOADS_DIR}/dlrm/requirements.txt && \
+    pip install tensorboard
+    # git clone https://github.com/facebookresearch/param.git && \
+    # pip3 install -r ${WORKLOADS_DIR}/param/requirements.txt
+
+    #==============================================================================
+    # Install torch_ucc (UCC version) python module and build a wheel package
+    ${SRC_DIR}/scripts/install_torch_ucc.sh
+
+    #============================================================================
+
+    # Run UCC tests
+    echo "INFO: Run UCC tests"
+    hostname
+    ${SRC_DIR}/scripts/run_tests_ucc.sh
+    #============================================================================
+
+    # Run Torch-UCC tests (UCC)
+    echo "INFO: Run Torch-UCC tests (UCC)"
+    hostname
+    ${SRC_DIR}/scripts/run_tests_torch_ucc.sh
+
+    #============================================================================
+  
+    # Run UCC MPI tests
+    # echo "INFO: Run UCC MPI tests"
+    # ${WORKSPACE}/.ci/scripts/run_tests_ucc_mpi_docker.sh
+
+    #============================================================================
+    # Run DLRM tests (UCC/GPU)
+    # echo "INFO: Run DLRM tests (UCC/GPU)"
+    # ${WORKSPACE}/.ci/scripts/run_dlrm_docker.sh

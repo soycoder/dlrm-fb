@@ -1,0 +1,26 @@
+Bootstrap: docker
+From: centos:8.3.2011
+
+%post
+    dnf clean all && \
+    dnf -y groupinstall 'development tools'  && \
+    dnf -y install wget openssl-devel bzip2-devel libffi-devel 
+
+    #==============================================================================
+
+    VERSION=3.8.1
+
+    # ========================= Install Python 3.8.1 =============================
+    wget https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz && \
+    tar -xf Python-${VERSION}.tgz && \
+    cd Python-${VERSION} && \
+    ./configure --enable-optimizations && \
+    make -j $(nproc) && \
+    make altinstall
+    
+    ln -s /usr/local/bin/python3.8 /usr/local/bin/python
+    ln -s /usr/local/bin/pip3.8 /usr/local/bin/pip
+
+    pip install --upgrade pip
+    
+    rm -rf /Python-${VERSION}*

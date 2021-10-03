@@ -1,0 +1,77 @@
+Bootstrap: localimage
+From: /root/DLRM/ct8.3-py3.8.sif
+
+# COMMAND BUILD 
+# $ls -la /lib/modules/
+    # total 8
+    # drwxr-xr-x.  5 root root  106 Oct  1 17:05 .
+    # dr-xr-xr-x. 37 root root 4096 Oct  1 12:41 ..
+    # drwxr-xr-x.  6 root root 4096 Oct  1 16:58 4.18.0-240.1.1.el8_3.x86_64
+    # drwxr-xr-x.  3 root root   19 Sep 22 07:44 4.18.0-240.el8.x86_64
+    # drwxr-xr-x.  3 root root  230 Oct  1 17:05 4.18.0-305.19.1.el8_4.x86_64
+# $ sudo singularity build -B /lib/modules/ ct8.3-py3.8-cu101-ofed.sif /root/DLRM/ct8.3-py3.8-cu101-ofed.def
+
+%environment
+    export PATH=/usr/local/cuda/bin:/opt/cmake/bin:${PATH}
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+
+%post
+    mkdir -p /tmp/dlrm
+    # yum groupinstall -y 'Infiniband Support'
+    yum config-manager --set-enabled powertools
+    yum install -y numactl numactl-devel wget python36 \
+    protobuf-compiler protobuf-devel rdma-core-devel gcc-gfortran lsof tcsh tk
+
+    #====================== Install Cmake ==========================
+    cd /tmp/dlrm && \
+    wget https://github.com/Kitware/CMake/releases/download/v3.20.4/cmake-3.20.4-linux-x86_64.sh && \
+    chmod +x /tmp/dlrm/cmake-3.20.4-linux-x86_64.sh && \
+    mkdir /opt/cmake && \
+    /tmp/dlrm/cmake-3.20.4-linux-x86_64.sh --skip-license --prefix=/opt/cmake
+    export PATH=/opt/cmake/bin:${PATH}
+
+
+    #====================== Install CUDA - v10.1  ==========================
+    # Link : https://developer.nvidia.com/blog/streamlining-nvidia-driver-deployment-on-rhel-8-with-modularity-streams/
+    dnf config-manager --add-repo=https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/cuda-rhel8.repo && \
+    dnf -y module install nvidia-driver:latest && \
+    dnf -y install cuda-10-1
+
+# %post
+#     # ====================== Install Mellanox OFED =======================
+#     ! Kernel space 
+    # mkdir -p /tmp/dlrm
+
+    # cd /tmp/dlrm && \
+    # wget https://content.mellanox.com/ofed/MLNX_OFED-5.1-2.5.8.0/MLNX_OFED_LINUX-5.1-2.5.8.0-rhel8.3-x86_64.tgz && \
+    # tar xf MLNX_OFED_LINUX-5.1-2.5.8.0-rhel8.3-x86_64.tgz && \
+    # cd MLNX_OFED_LINUX-5.1-2.5.8.0-rhel8.3-x86_64 && \
+    # ./mlnxofedinstall 
+
+    mkdir -p /tmp/dlrm && \
+    cd /tmp/dlrm && \
+    wget https://www.mellanox.com/downloads/ofed/MLNX_OFED-4.9-4.0.8.0/MLNX_OFED_LINUX-4.9-4.0.8.0-rhel8.3-x86_64.tgz && \
+    tar xf MLNX_OFED_LINUX-4.9-4.0.8.0-rhel8.3-x86_64.tgz && \
+    cd MLNX_OFED_LINUX-4.9-4.0.8.0-rhel8.3-x86_64 && \
+    ./mlnxofedinstall --force
+
+    # # ubuntu20.04
+    # mkdir -p /tmp/dlrm && \
+    # wget https://content.mellanox.com/ofed/MLNX_OFED-5.4-1.0.3.0/MLNX_OFED_LINUX-5.4-1.0.3.0-ubuntu20.04-x86_64.tgz && \
+    # tar xf MLNX_OFED_LINUX-5.4-1.0.3.0-ubuntu20.04-x86_64.tgz && \
+    # cd MLNX_OFED_LINUX-5.4-1.0.3.0-ubuntu20.04-x86_64.tgz && \
+    # ./mlnxofedinstall 
+
+    # # ubuntu18.04
+    
+
+    # # ====================== Install HPC-X =======================
+    # mkdir -p /tmp/dlrm && \
+    # cd /tmp/dlrm && \
+    # wget https://content.mellanox.com/hpc/hpc-x/v2.8/hpcx-v2.8.0-gcc-MLNX_OFED_LINUX-5.2-1.0.4.0-redhat8.3-x86_64.tbz && \
+    # tar xf hpcx-v2.8.0-gcc-MLNX_OFED_LINUX-5.2-1.0.4.0-redhat8.3-x86_64.tbz && \
+    # cd hpcx-v2.8.0-gcc-MLNX_OFED_LINUX-5.2-1.0.4.0-redhat8.3-x86_64.tbz && \
+    # ./mlnxofedinstall --force 
+
+    # Remove tools
+    rm -rf /tmp/dlrm
