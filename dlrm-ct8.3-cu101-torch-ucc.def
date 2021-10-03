@@ -91,13 +91,13 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     PATH=${UCX_INSTALL_DIR}/bin:${PATH}
     #==============================================================================
     # Configure Python
-    # ${SRC_DIR}/scripts/configure_python.sh
+    # ${SRC_DIR}/script/configure_python.sh
     #==============================================================================
     # Build UCC
-    ${SRC_DIR}/devel/scripts/build_ucc.sh
+    ${SRC_DIR}/devel/script/build_ucc.sh
     #==============================================================================
     # Install PyTorch
-    ${SRC_DIR}/devel/scripts/install_torch.sh
+    ${SRC_DIR}/devel/script/install_torch.sh
     #==============================================================================
 
     #==============================================================================
@@ -112,28 +112,28 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
 
     #==============================================================================
     # Install torch_ucc (UCC version) python module and build a wheel package
-    ${SRC_DIR}/devel/scripts/install_torch_ucc.sh
+    ${SRC_DIR}/devel/script/install_torch_ucc.sh
 
     #============================================================================
 
     # Run UCC tests
     echo "INFO: Run UCC tests"
     hostname
-    ${SRC_DIR}/devel/scripts/run_tests_ucc.sh
+    ${SRC_DIR}/devel/script/run_tests_ucc.sh
     #============================================================================
 
     # Run Torch-UCC tests (UCC)
     echo "INFO: Run Torch-UCC tests (UCC)"
     hostname
-    ${SRC_DIR}/devel/scripts/run_tests_torch_ucc.sh
+    ${SRC_DIR}/devel/script/run_tests_torch_ucc.sh
 
     #============================================================================
   
     # Run UCC MPI tests
     # echo "INFO: Run UCC MPI tests"
-    # ${WORKSPACE}/.ci/scripts/run_tests_ucc_mpi_docker.sh
+    # ${WORKSPACE}/.ci/script/run_tests_ucc_mpi_docker.sh
 
     #============================================================================
     # Run DLRM tests (UCC/GPU)
     # echo "INFO: Run DLRM tests (UCC/GPU)"
-    # ${WORKSPACE}/.ci/scripts/run_dlrm_docker.sh
+    # ${WORKSPACE}/.ci/script/run_dlrm_docker.sh
