@@ -12,4 +12,4 @@ cd "${UCC_SRC_DIR}/build"
 make -j install
 echo "${UCC_INSTALL_DIR}/lib" > /etc/ld.so.conf.d/ucc.conf
 ldconfig
-ldconfig -p | grep -i libucc | cat
+ldconfig -p | grep -i libucc
