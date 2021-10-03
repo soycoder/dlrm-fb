@@ -9,7 +9,7 @@ cd "${SRC_DIR}/ucx"
     --program-prefix= --disable-dependency-tracking \
     --exec-prefix=${UCX_INSTALL_DIR} --bindir=${UCX_INSTALL_DIR}/bin \
     --sbindir=${UCX_INSTALL_DIR}/sbin --sysconfdir=/etc --datadir=${UCX_INSTALL_DIR}/share \
-    --includedir=${UCX_INSTALL_DIR}/include --libdir=${UCX_INSTALL_DIR}/lib64 \
+    --includedir=${UCX_INSTALL_DIR}/include --libdir=${UCX_INSTALL_DIR}/lib \
     --libexecdir=${UCX_INSTALL_DIR}/libexec --localstatedir=/var \
     --sharedstatedir=/var/lib --mandir=${UCX_INSTALL_DIR}/share/man \
     --infodir=${UCX_INSTALL_DIR}/share/info --disable-optimizations \
