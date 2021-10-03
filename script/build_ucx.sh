@@ -13,7 +13,7 @@ cd "${SRC_DIR}/ucx"
     --libexecdir=${UCX_INSTALL_DIR}/libexec --localstatedir=/var \
     --sharedstatedir=/var/lib --mandir=${UCX_INSTALL_DIR}/share/man \
     --infodir=${UCX_INSTALL_DIR}/share/info --disable-optimizations \
-    --enable-cma   \
+    --enable-cma --with-cuda  \
     --with-verbs --with-cm --with-knem --with-rdmacm \
     --without-rocm --without-xpmem --without-ugni \
     --without-java  --with-cuda=/usr/local/cuda
