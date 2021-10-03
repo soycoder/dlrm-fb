@@ -21,4 +21,3 @@ make -j install
 echo "${UCX_INSTALL_DIR}/lib" > /etc/ld.so.conf.d/ucx.conf
 ldconfig
 # ldconfig -p | grep -i ucx
-ucx_info -v
