@@ -105,8 +105,8 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     cd ${WORKLOADS_DIR} && \
     git clone https://github.com/facebookresearch/dlrm.git && \
     cd ${WORKLOADS_DIR}/dlrm && \
-    pip install -r ${WORKLOADS_DIR}/dlrm/requirements.txt && \
-    pip install tensorboard
+    pip install --prefix=/usr/local  --no-cache-dir -r ${WORKLOADS_DIR}/dlrm/requirements.txt && \
+    pip install --prefix=/usr/local  tensorboard
     # git clone https://github.com/facebookresearch/param.git && \
     # pip3 install -r ${WORKLOADS_DIR}/param/requirements.txt
 
