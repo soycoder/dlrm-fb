@@ -1,0 +1,79 @@
+Bootstrap: localimage
+From: /root/DLRM/dlrm-ct8.3-cu101-torch-ucc.sif
+
+# COMMAND BUILD 
+# $ sudo singularity build dlrm-ct8.3-cu101-torch-ucc-extrae3.8.3.sif /root/DLRM/singularity.def.d/dlrm-ct8.3-cu101-torch-ucc-extrae3.8.3.def
+
+
+%post  
+  mkdir -p /tools
+  dnf -y install gcc-gfortran binutils-devel libxml2-devel systemd-devel
+
+#Clustering Tool
+  cd /tools
+  wget http://167.71.205.129/tools/clusteringsuite-2.6.9-Linux_x86_64_legacy.tar.bz2
+  tar xf clusteringsuite-2.6.9-Linux_x86_64_legacy.tar.bz2
+  rm clusteringsuite-2.6.9-Linux_x86_64_legacy.tar.bz2
+  mv clusteringsuite-2.6.9-Linux_x86_64_legacy /usr/local/clustering 
+
+#Tracking Tool
+  wget http://167.71.205.129/tools/tracking-2.6.12-Linux_x86_64.tar.bz2
+  tar xf tracking-2.6.12-Linux_x86_64.tar.bz2
+  rm tracking-2.6.12-Linux_x86_64.tar.bz2
+  mv tracking-2.6.12-Linux_x86_64 /usr/local/tracking
+ 
+#Folding Tool 
+  wget http://167.71.205.129/tools/folding-1.3.2-Linux_x86_64.tar.bz2
+  tar xf folding-1.3.2-Linux_x86_64.tar.bz2
+  rm folding-1.3.2-Linux_x86_64.tar.bz2
+  mv folding-1.3.2-Linux_x86_64 /usr/local/folding
+
+#Spectral Analysis Tool
+  wget http://167.71.205.129/tools/spectral-3.4.1-Linux_x86_64.tar.bz2
+  tar xf spectral-3.4.1-Linux_x86_64.tar.bz2
+  rm spectral-3.4.1-Linux_x86_64.tar.bz2
+  mv spectral-3.4.1-Linux_x86_64 /usr/local/spectral
+
+#Dimemas 
+  wget http://167.71.205.129/tools/dimemas-5.4.2-Linux_x86_64_legacy.tar.bz2
+  tar xf dimemas-5.4.2-Linux_x86_64_legacy.tar.bz2
+  rm dimemas-5.4.2-Linux_x86_64_legacy.tar.bz2
+  mv dimemas-5.4.2-b-Linux_x86_64_legacy /usr/local/dimemas
+
+#Extrae Installation
+  cd /tools
+  wget http://167.71.205.129/tools/extrae-3.8.3-src.tar.bz2
+  tar xf extrae-3.8.3-src.tar.bz2 
+  rm extrae-3.8.3-src.tar.bz2
+  cd extrae-3.8.3
+  ./configure --prefix=/usr/local/extrae \
+    --with-binutils=/usr \
+    --enable-cuda=/usr/local/cuda \
+    --enable-merge-in-trace \
+    --enable-parallel-merge \
+    --with-clustering=/usr/local/clustering \
+    --with-mpi=/usr/mpi/gcc/openmpi-4.0.3rc4 \
+    --without-papi \
+    --enable-openmp \
+    --without-unwind \
+    --without-elf \
+    --without-dyninst \
+
+  make && make install -j4 
+  echo "/usr/local/extrae" > extrae-lib-path.conf
+  mv extrae-lib-path.conf /etc/ld.so.conf.d/
+  ldconfig 
+ 
+%environment
+ export LC_ALL=C
+  export PATH=$PATH:/usr/local/extrae/bin:/usr/local/clustering/bin
+  export PATH=$PATH:/usr/local/spectral/bin:/usr/local/folding/bin:/usr/local/tracking/bin
+  export LD_LIBRARY_PATH=/usr/local/extrae/lib:$LD_LIBRARY_PATH
+  export EXTRAE_HOME=/usr/local/extrae
+  export DIMEMAS_HOME=/usr/local/dimemas
+ 
+%runscript
+
+%labels
+  Author HPC-AI 2021 CSTU Lampang Team
+
