@@ -116,24 +116,24 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
 
     #============================================================================
 
-    # Run UCC tests
+    # ❌ Run UCC tests (gtest)
     # echo "INFO: Run UCC tests"
     # hostname
     # ${SRC_DIR}/devel/script/run_tests_ucc.sh
     #============================================================================
 
-    # Run Torch-UCC tests (UCC)
-    echo "INFO: Run Torch-UCC tests (UCC)"
-    hostname
-    ${SRC_DIR}/devel/script/run_tests_torch_ucc.sh
+    # ✅ Run Torch-UCC tests (UCC)
+    # echo "INFO: Run Torch-UCC tests (UCC)"
+    # hostname
+    # ${SRC_DIR}/devel/script/run_tests_torch_ucc.sh
 
     #============================================================================
   
-    # Run UCC MPI tests
+    # ❌ Run UCC MPI tests
     # echo "INFO: Run UCC MPI tests"
     # ${WORKSPACE}/.ci/script/run_tests_ucc_mpi_docker.sh
 
     #============================================================================
-    # Run DLRM tests (UCC/GPU)
+    # ❓ Run DLRM tests (UCC/GPU)
     # echo "INFO: Run DLRM tests (UCC/GPU)"
     # ${WORKSPACE}/.ci/script/run_dlrm_docker.sh
