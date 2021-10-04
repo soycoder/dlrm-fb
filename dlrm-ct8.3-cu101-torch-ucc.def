@@ -50,7 +50,7 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
 
     export PATH=/usr/mpi/gcc/openmpi-4.0.3rc4/bin:$PATH 
     export LD_LIBRARY_PATH=/usr/mpi/gcc/openmpi-4.0.3rc4/lib:${LD_LIBRARY_PATH}
-    
+
     # Install CMake
     cd /tmp && wget https://github.com/Kitware/CMake/releases/download/v3.20.4/cmake-3.20.4-linux-x86_64.sh && \
     chmod +x /tmp/cmake-3.20.4-linux-x86_64.sh && /tmp/cmake-3.20.4-linux-x86_64.sh --skip-license --prefix=/usr && \
@@ -66,7 +66,7 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     rm -f /run/nologin
 
     #==============================================================================
-    git clone ${TORCH_UCC_GITHUB_URL} ${SRC_DIR}/torch_ucc/ && \
+    git clone ${TORCH_UCC_GITHUB_URL} ${SRC_DIR}/torch_ucc && \
     cd ${SRC_DIR}/torch_ucc && \
     git checkout ${TORCH_UCC_BRANCH}
 
@@ -101,6 +101,7 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
 
     #==============================================================================
     # Install workloads
+    mkdir -p ${WORKLOADS_DIR} && \
     cd ${WORKLOADS_DIR} && \
     git clone https://github.com/facebookresearch/dlrm.git && \
     cd ${WORKLOADS_DIR}/dlrm && \
