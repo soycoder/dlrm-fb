@@ -7,6 +7,6 @@ export UCX_HOME=${UCX_INSTALL_DIR}
 export UCC_HOME=${UCC_INSTALL_DIR}
 export WITH_CUDA=${CUDA_HOME}
 cd "${TORCH_UCC_INSTALL_DIR}"
-python setup.py install bdist_wheel --prefix=/usr/local
+python setup.py install bdist_wheel
 pip list | grep torch
 python -c 'import torch, torch_ucc'
