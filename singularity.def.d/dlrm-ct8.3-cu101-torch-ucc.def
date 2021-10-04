@@ -117,9 +117,9 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     #============================================================================
 
 %test
-    SRC_DIR=/tools
-    BIN_DIR=/opt
-    export TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
+    # SRC_DIR=/tools
+    # BIN_DIR=/opt
+    # export TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
     
     # ❌ Run UCC tests (gtest)
     # echo "INFO: Run UCC tests"
@@ -128,9 +128,9 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     #============================================================================
 
     # ✅ Run Torch-UCC tests (UCC)
-    echo "INFO: Run Torch-UCC tests (UCC)"
-    hostname
-    ${SRC_DIR}/devel/script/run_tests_torch_ucc.sh
+    # echo "INFO: Run Torch-UCC tests (UCC)"
+    # hostname
+    # ${SRC_DIR}/devel/script/run_tests_torch_ucc.sh
 
     #============================================================================
   
