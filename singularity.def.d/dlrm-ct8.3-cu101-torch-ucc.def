@@ -2,7 +2,7 @@ Bootstrap: localimage
 From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
 
 # COMMAND BUILD 
-# $ sudo singularity build dlrm-ct8.3-cu101-torch-ucc.sif /root/DLRM/dlrm-ct8.3-cu101-torch-ucc.def
+# $ sudo singularity build dlrm-ct8.3-cu101-torch-ucc.sif /root/DLRM/singularity.def.d/dlrm-ct8.3-cu101-torch-ucc.def
 
 
 %post
@@ -66,8 +66,8 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     rm -f /run/nologin
 
     #==============================================================================
-    git clone ${TORCH_UCC_GITHUB_URL} ${SRC_DIR}/torch_ucc && \
-    cd ${SRC_DIR}/torch_ucc && \
+    git clone ${TORCH_UCC_GITHUB_URL} ${TORCH_UCC_INSTALL_DIR} && \
+    cd ${TORCH_UCC_INSTALL_DIR} && \
     git checkout ${TORCH_UCC_BRANCH}
 
     mkdir -p ${SRC_DIR}/ucx && \
