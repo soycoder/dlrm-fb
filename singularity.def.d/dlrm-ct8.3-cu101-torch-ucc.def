@@ -116,6 +116,9 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
 
     #============================================================================
 
+%test
+    SRC_DIR=/tools
+
     # ❌ Run UCC tests (gtest)
     # echo "INFO: Run UCC tests"
     # hostname
@@ -123,9 +126,9 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     #============================================================================
 
     # ✅ Run Torch-UCC tests (UCC)
-    # echo "INFO: Run Torch-UCC tests (UCC)"
-    # hostname
-    # ${SRC_DIR}/devel/script/run_tests_torch_ucc.sh
+    echo "INFO: Run Torch-UCC tests (UCC)"
+    hostname
+    ${SRC_DIR}/devel/script/run_tests_torch_ucc.sh
 
     #============================================================================
   
@@ -137,3 +140,7 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     # ❓ Run DLRM tests (UCC/GPU)
     # echo "INFO: Run DLRM tests (UCC/GPU)"
     # ${WORKSPACE}/.ci/script/run_dlrm_docker.sh
+
+%environment
+    export PATH=/usr/mpi/gcc/openmpi-4.0.3rc4/bin:/opt/ucx/bin:/opt/ucc/bin:$PATH 
+    export LD_LIBRARY_PATH=/usr/mpi/gcc/openmpi-4.0.3rc4/lib:${LD_LIBRARY_PATH}
