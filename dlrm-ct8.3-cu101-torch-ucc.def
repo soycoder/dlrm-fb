@@ -48,10 +48,9 @@ From: /root/DLRM/ct8.3-py3.8-cu101-ofed.sif
     # Remove old UCX
     rpm -e --nodeps ucx
 
-    PATH=/usr/lib64/openmpi/bin:$PATH
-    echo "export PATH=\"/usr/lib64/openmpi/bin:\$PATH\"" >> /etc/bashrc && \
-    export LD_LIBRARY_PATH=\"/usr/lib64/openmpi/lib:\${LD_LIBRARY_PATH}\" >> /etc/bashrc
-
+    export PATH=/usr/mpi/gcc/openmpi-4.0.3rc4/bin:$PATH 
+    export LD_LIBRARY_PATH=/usr/mpi/gcc/openmpi-4.0.3rc4/lib:${LD_LIBRARY_PATH}
+    
     # Install CMake
     cd /tmp && wget https://github.com/Kitware/CMake/releases/download/v3.20.4/cmake-3.20.4-linux-x86_64.sh && \
     chmod +x /tmp/cmake-3.20.4-linux-x86_64.sh && /tmp/cmake-3.20.4-linux-x86_64.sh --skip-license --prefix=/usr && \
