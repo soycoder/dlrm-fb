@@ -1,0 +1,50 @@
+Bootstrap: localimage
+From: /root/DLRM/ct8.3-py3.8.sif
+
+# COMMAND BUILD 
+# $ls -la /lib/modules/
+    # total 8
+    # drwxr-xr-x.  5 root root  106 Oct  1 17:05 .
+    # dr-xr-xr-x. 37 root root 4096 Oct  1 12:41 ..
+    # drwxr-xr-x.  6 root root 4096 Oct  1 16:58 4.18.0-240.1.1.el8_3.x86_64
+    # drwxr-xr-x.  3 root root   19 Sep 22 07:44 4.18.0-240.el8.x86_64
+    # drwxr-xr-x.  3 root root  230 Oct  1 17:05 4.18.0-305.19.1.el8_4.x86_64
+# $ sudo singularity build -B /lib/modules/ ct8.3-py3.8-cuda-ofed.sif /root/DLRM/singularity.def.d/ct8.3-py3.8-cuda-ofed.def
+
+%environment
+    export PATH=/usr/local/cuda/bin:${PATH}
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+
+%post
+    mkdir -p /tmp/dlrm
+    # yum groupinstall -y 'Infiniband Support'
+    yum config-manager --set-enabled powertools && yum install -y \
+    numactl \
+    numactl-devel \
+    openmpi \
+    openmpi-devel \
+    openssh-server \
+    protobuf-compiler \
+    protobuf-devel \
+    python36-devel \
+    rdma-core-devel \
+    nano \
+    wget \
+    gcc-gfortran lsof tcsh tk
+
+
+    #====================== Install CUDA vlatest  ==========================
+    # Link : https://developer.nvidia.com/blog/streamlining-nvidia-driver-deployment-on-rhel-8-with-modularity-streams/
+    dnf config-manager --add-repo=https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/cuda-rhel8.repo && \
+    dnf -y module install nvidia-driver:latest && \
+    dnf -y install cuda
+
+    #====================== MLNX-OFED-4.9-4.0.8.0  ==========================
+    cd /tmp/dlrm && \
+    wget https://www.mellanox.com/downloads/ofed/MLNX_OFED-4.9-4.0.8.0/MLNX_OFED_LINUX-4.9-4.0.8.0-rhel8.3-x86_64.tgz && \
+    tar xf MLNX_OFED_LINUX-4.9-4.0.8.0-rhel8.3-x86_64.tgz && \
+    cd MLNX_OFED_LINUX-4.9-4.0.8.0-rhel8.3-x86_64 && \
+    ./mlnxofedinstall --force
+    
+    # Remove tools
+    rm -rf /tmp/dlrm
