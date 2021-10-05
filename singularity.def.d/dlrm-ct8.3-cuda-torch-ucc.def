@@ -119,9 +119,9 @@ From: /root/DLRM/ct8.3-py3.8-cuda-ofed.sif
     #============================================================================
 
 %test
-    SRC_DIR=/tools
-    BIN_DIR=/opt
-    export TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
+    # SRC_DIR=/tools
+    # BIN_DIR=/opt
+    # export TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
     
     # ❌ Run UCC tests (gtest)
     # echo "INFO: Run UCC tests"
