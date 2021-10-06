@@ -1020,33 +1020,33 @@ def getCriteoAdData(
                     # debug prints
                     if float(i)/num_data_in_split*100 > percent+1:
                         percent = int(float(i)/num_data_in_split*100)
-                        print(
-                            "Load %d/%d (%d%%) Split: %d  Label True: %d  Stored: %d"
-                            % (
-                                i,
-                                num_data_in_split,
-                                percent,
-                                split,
-                                target,
-                                y[i],
-                            ),
-                            end="\n",
-                        )
+                        # print(
+                        #     "Load %d/%d (%d%%) Split: %d  Label True: %d  Stored: %d"
+                        #     % (
+                        #         i,
+                        #         num_data_in_split,
+                        #         percent,
+                        #         split,
+                        #         target,
+                        #         y[i],
+                        #     ),
+                        #     end="\n",
+                        # )
                 else:
                     for j in range(26):
                         convertDicts[j][X_cat[i][j]] = 1
                     # debug prints
-                    print(
-                        "Load %d/%d  Split: %d  Label True: %d  Stored: %d"
-                        % (
-                            i,
-                            num_data_in_split,
-                            split,
-                            target,
-                            y[i],
-                        ),
-                        end="\r",
-                    )
+                    # print(
+                    #     "Load %d/%d  Split: %d  Label True: %d  Stored: %d"
+                    #     % (
+                    #         i,
+                    #         num_data_in_split,
+                    #         split,
+                    #         target,
+                    #         y[i],
+                    #     ),
+                    #     end="\r",
+                    # )
                 i += 1
 
             # store num_data_in_split samples or extras at the end of file
