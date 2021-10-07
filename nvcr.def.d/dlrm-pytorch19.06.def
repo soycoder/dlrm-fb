@@ -1,0 +1,76 @@
+Bootstrap: localimage
+From: /root/DLRM/nvcr.sif.d/pytorch_19.06-py3.sif
+
+# COMMAND BUILD 
+# $ sudo singularity build dlrm-pytorch19.06.sif /root/DLRM/nvcr.def.d/dlrm-pytorch19.06.def
+
+%post
+
+    export SRC_DIR=/tools
+    BIN_DIR=/opt
+    # 
+    export CUDA_HOME=/usr/local/cuda
+    # 
+    UCX_GITHUB_URL=https://github.com/openucx/ucx.git
+    UCX_BRANCH=master
+    export UCX_INSTALL_DIR=${BIN_DIR}/ucx
+    UCX_BUILD_TYPE=release-mt
+    # 
+    UCC_GITHUB_URL=https://github.com/openucx/ucc.git
+    UCC_BRANCH=master
+    export UCC_INSTALL_DIR=${BIN_DIR}/ucc
+    # 
+    TORCH_UCC_GITHUB_URL=https://github.com/facebookresearch/torch_ucc.git
+    TORCH_UCC_BRANCH=main
+    export TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
+    # 
+    WORKLOADS_DIR=${BIN_DIR}/workloads
+
+    #==============================================================================
+    git clone ${TORCH_UCC_GITHUB_URL} ${TORCH_UCC_INSTALL_DIR} && \
+    cd ${TORCH_UCC_INSTALL_DIR} && \
+    git checkout ${TORCH_UCC_BRANCH}
+
+    mkdir -p ${SRC_DIR}/ucx && \
+    git clone --recursive ${UCX_GITHUB_URL} ${SRC_DIR}/ucx && \
+    cd ${SRC_DIR}/ucx && \
+    git checkout ${UCX_BRANCH}
+
+    mkdir -p ${SRC_DIR}/ucc && \
+    git clone --recursive ${UCC_GITHUB_URL} ${SRC_DIR}/ucc && \
+    cd ${SRC_DIR}/ucc && \
+    git checkout ${UCC_BRANCH}
+
+    git clone https://github.com/soycoder/dlrm-fb.git ${SRC_DIR}/devel && \
+    cd ${SRC_DIR}/devel && \
+    git checkout devel
+
+    #==============================================================================
+    # Build UCX
+    ${SRC_DIR}/devel/script/build_ucx.sh
+    PATH=${UCX_INSTALL_DIR}/bin:${PATH}
+    #==============================================================================
+    # Build UCC
+    ${SRC_DIR}/devel/script/build_ucc.sh
+    #==============================================================================
+    # Install PyTorch
+    # ${SRC_DIR}/devel/script/install_torch.sh
+    conda install pytorch==1.7.1 torchvision==0.8.2 torchaudio==0.7.2 cudatoolkit=10.1 -c pytorch
+
+    #==============================================================================
+
+    #==============================================================================
+    # Install workloads
+    mkdir -p ${WORKLOADS_DIR} && \
+    cd ${WORKLOADS_DIR} && \
+    git clone https://github.com/facebookresearch/dlrm.git && \
+    cd ${WORKLOADS_DIR}/dlrm && \
+    conda install -y tensorboard
+
+    
+    #==============================================================================
+
+%environment
+    export LC_ALL=C
+    export PATH=/usr/mpi/gcc/openmpi-4.0.3rc4/bin:/opt/ucx/bin:/opt/ucc/bin:$PATH 
+    export LD_LIBRARY_PATH=/usr/mpi/gcc/openmpi-4.0.3rc4/lib:${LD_LIBRARY_PATH}

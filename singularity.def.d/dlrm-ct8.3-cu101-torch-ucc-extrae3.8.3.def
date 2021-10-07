@@ -1,8 +1,8 @@
 Bootstrap: localimage
-From: /root/DLRM/dlrm-ct8.3-cuda-torch-ucc.sif
+From: /root/DLRM/dlrm-ct8.3-cu101-torch-ucc.sif
 
 # COMMAND BUILD 
-# $ sudo singularity build dlrm-ct8.3-cuda-torch-ucc-extrae3.8.3.sif /root/DLRM/singularity.def.d/dlrm-ct8.3-cuda-torch-ucc-extrae3.8.3.def
+# $ sudo singularity build dlrm-ct8.3-cu101-torch-ucc-extrae.sif /root/DLRM/singularity.def.d/dlrm-ct8.3-cu101-torch-ucc-extrae3.8.3.def
 
 
 %post  
