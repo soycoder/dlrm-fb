@@ -1,0 +1,20 @@
+Bootstrap: library
+From: ubuntu:18.04
+
+%post
+    <file>
+
+
+
+%runscript
+    echo "Run at $NOW"
+    echo "Arguments received: $*"
+    <file>
+
+%test
+    grep -q NAME=\"Ubuntu\" /etc/os-release
+    if [ $? -eq 0 ]; then
+        echo "Container base is Ubuntu as expected."
+    else
+        echo "Container base is not Ubuntu."
+    fi
