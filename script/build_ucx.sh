@@ -6,7 +6,7 @@ cd "${SRC_DIR}/ucx"
 "${SRC_DIR}/ucx/autogen.sh"
 "${SRC_DIR}/ucx/contrib/configure-release-mt" --prefix="${UCX_INSTALL_DIR}" \
     --enable-cma --with-cuda  \
-    --with-verbs --with-cm --with-knem --with-rdmacm \
+    --with-verbs --with-cm --with-knem \
     --without-rocm --without-xpmem --without-ugni \
     --without-java  --with-cuda=/usr/local/cuda
 make -j install
