@@ -24,7 +24,6 @@ From: /root/DLRM/nvcr.sif.d/pytorch_19.06-py3.sif
     TORCH_UCC_BRANCH=main
     export TORCH_UCC_INSTALL_DIR=${BIN_DIR}/torch_ucc
     # 
-    WORKLOADS_DIR=${BIN_DIR}/workloads
 
     #==============================================================================
     git clone ${TORCH_UCC_GITHUB_URL} ${TORCH_UCC_INSTALL_DIR} && \
@@ -54,18 +53,15 @@ From: /root/DLRM/nvcr.sif.d/pytorch_19.06-py3.sif
     ${SRC_DIR}/devel/script/build_ucc.sh
     #==============================================================================
     # Install PyTorch
-    # ${SRC_DIR}/devel/script/install_torch.sh
-    conda install pytorch==1.7.1 torchvision==0.8.2 torchaudio==0.7.2 cudatoolkit=10.1 -c pytorch
+    ${SRC_DIR}/devel/script/install_torch.sh
+    # conda install pytorch==1.7.1 torchvision==0.8.2 torchaudio==0.7.2 cudatoolkit=10.1 -c pytorch
 
     #==============================================================================
 
     #==============================================================================
-    # Install workloads
-    mkdir -p ${WORKLOADS_DIR} && \
-    cd ${WORKLOADS_DIR} && \
-    git clone https://github.com/facebookresearch/dlrm.git && \
-    cd ${WORKLOADS_DIR}/dlrm && \
-    conda install -y tensorboard
+    # Install package for DLRM
+    pip install -y future numpy onnx pydot torch torchviz scikit-learn tqdm
+    pip install -y tensorboard
 
     
     #==============================================================================
