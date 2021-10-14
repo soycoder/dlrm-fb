@@ -55,15 +55,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import argparse
 
-# Extrae
-### Load the Extrae python module in your own python application
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-    try:
-        import pyextrae.sequential as pyextrae
-    except ImportError as error:
-        print("Unable to import pyextrae (Extrae python module). ", error)
-
 # miscellaneous
 import builtins
 import datetime
@@ -75,6 +66,15 @@ import time
 # The onnx import causes deprecation warnings every time workers
 # are spawned during testing. So, we filter out those warnings.
 import warnings
+
+# Extrae
+### Load the Extrae python module in your own python application
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    try:
+        import pyextrae.sequential as pyextrae
+    except ImportError as error:
+        print("Unable to import pyextrae (Extrae python module). ", error)
 
 # data generation
 import dlrm_data_pytorch as dp
