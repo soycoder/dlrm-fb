@@ -6,6 +6,17 @@ export CUDA_BIN_PATH=/usr/local/cuda10.1/bin
 export CUCACXX="nvcc -arch=compute_70 -code=sm_70 -O2"
 export CMAKE_CUDA_COMPILER=/usr/local/cuda-10.1/bin/nvcc
 
+#CUDA config
+cd /usr/local/cuda
+ln -s lib64 lib
+cd /usr/local/cuda/extras/CUPTI
+ln -s lib64 lib
+
+#CUPTI config
+echo "/usr/local/cuda/extras/CUPTI/lib" > cupti-lib-path.conf
+mv cupti-lib-path.conf /etc/ld.so.conf.d/
+ldconfig 
+
 mkdir -p /tools
 cd /tools 
 git clone https://github.com/pytorch/pytorch.git
