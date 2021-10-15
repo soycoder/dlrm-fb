@@ -1,9 +1,10 @@
 #!/bin/bash -eEx
 set -o pipefail
 
-cd /tmp 
+mkdir -p /tools
+cd /tools 
 git clone https://github.com/pytorch/pytorch.git
-cd /tmp/pytorch
+cd /tools/pytorch
 git submodule sync --recursive
 git submodule update --init --recursive
 git checkout v1.9.1
@@ -24,4 +25,4 @@ export USE_KINETO=1
 export MAX_JOBS=$(($(nproc)-1))
 python setup.py install
 
-rm -rf /tmp/pytorch
+rm -rf /tools/pytorch
