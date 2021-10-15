@@ -1,6 +1,11 @@
 #!/bin/bash -eEx
 set -o pipefail
 
+export CUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda10.1
+export CUDA_BIN_PATH=/usr/local/cuda10.1/bin
+export CUCACXX="nvcc -arch=compute_70 -code=sm_70 -O2"
+export CMAKE_CUDA_COMPILER=/usr/local/cuda-10.1/bin/nvcc
+
 mkdir -p /tools
 cd /tools 
 git clone https://github.com/pytorch/pytorch.git
