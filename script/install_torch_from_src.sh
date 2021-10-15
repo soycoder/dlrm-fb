@@ -14,7 +14,7 @@ git submodule sync --recursive
 git submodule update --init --recursive
 git checkout v1.8.1
 pip install -r requirements.txt
-export TORCH_CUDA_ARCH_LIST="7.0 8.0+PTX"
+export TORCH_CUDA_ARCH_LIST="7.0+PTX"
 export USE_GLOO=1
 export USE_DISTRIBUTED=1
 export USE_OPENCV=0
