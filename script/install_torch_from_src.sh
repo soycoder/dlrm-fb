@@ -7,7 +7,7 @@ git clone https://github.com/pytorch/pytorch.git
 cd /tools/pytorch
 git submodule sync --recursive
 git submodule update --init --recursive
-git checkout v1.9.1
+git checkout v1.8.1
 pip install -r requirements.txt
 export TORCH_CUDA_ARCH_LIST="7.0 8.0+PTX"
 export USE_GLOO=1
