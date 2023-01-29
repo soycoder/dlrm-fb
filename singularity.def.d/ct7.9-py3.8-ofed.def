@@ -1,0 +1,58 @@
+Bootstrap: localimage
+From: /root/ct7.9-py3.8.sif
+
+# COMMAND BUILD 
+# $ ls -la /lib/modules/
+    # total 12
+    # drwxr-xr-x.  4 root root   71 Oct 12 19:05 .
+    # dr-xr-xr-x. 23 root root 4096 Oct 12 19:31 ..
+    # drwxr-xr-x.  7 root root 4096 Apr 22  2020 3.10.0-1127.el7.x86_64
+    # drwxr-xr-x.  7 root root 4096 Oct 12 19:05 3.10.0-1160.42.2.el7.x86_64
+# $ sudo singularity build -B /lib/modules/ ct7.9-py3.8-ofed.sif ct7.9-py3.8-ofed.def
+# singularity build ct7.9-py3.8-ofed.sif ct7.9-py3.8-ofed.def
+
+
+%post
+    mkdir -p /tmp/dlrm
+    yum groupinstall -y 'Infiniband Support' 
+    yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    yum install -y \
+    numactl \
+    numactl-devel \
+    openssh-server \
+    protobuf-compiler \
+    protobuf-devel \
+    python36-devel \
+    rdma-core-devel \
+    nano \
+    wget \
+    which \
+    gcc-gfortran lsof tcsh tk
+
+    yum install -y libibverbs libibumad libibverbs-devel libmlx5 libibverbs-utils
+
+
+    # yum remove -y libibumad libibverbs-devel libibverbs libmlx5 libibverbs-utils
+    # yum install -y python-devel ethtool elfutils-libelf-devel
+
+
+    #====================== Install CUDA - v10.1  ==========================
+    # Link : https://developer.nvidia.com/blog/streamlining-nvidia-driver-deployment-on-rhel-8-with-modularity-streams/
+    yum config-manager --add-repo=https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo && \
+    yum -y module install nvidia-driver:418 && \
+    yum -y install cuda-10-1
+    # wget https://developer.download.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.1_20191031/RHEL7_3-x64/libcudnn7-devel-7.6.5.32-1.cuda10.1.x86_64.rpm
+    # wget https://developer.download.nvidia.com/compute/machine-learning/cudnn/secure/7.6.5.32/Production/10.1_20191031/RHEL7_3-x64/libcudnn7-7.6.5.32-1.cuda10.1.x86_64.rpm
+    
+
+    #====================== MLNX-OFED-4.9-4.0.8.0  ==========================
+    # cd /tmp/dlrm && \
+    # wget https://linuxsoft.cern.ch/cern/centos/7/updates/x86_64/Packages/Packages/kernel-devel-$(uname -r).rpm && \
+    # yum localinstall -y kernel-devel-$(uname -r).rpm && \
+    # wget https://content.mellanox.com/ofed/MLNX_OFED-4.9-4.0.8.0/MLNX_OFED_LINUX-4.9-4.0.8.0-rhel7.9-x86_64.tgz &&\
+    # tar xf MLNX_OFED_LINUX-4.9-4.0.8.0-rhel7.9-x86_64.tgz && \
+    # cd MLNX_OFED_LINUX-4.9-4.0.8.0-rhel7.9-x86_64 && \
+    # ./mlnxofedinstall --force --add-kernel-support --skip-repo
+
+    # Remove tools
+    rm -rf /tmp/dlrm

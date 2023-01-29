@@ -1,0 +1,26 @@
+Bootstrap: localimage
+From: /root/ct7.9-gcc7.3.sif
+
+# COMMAND BUILD 
+# $ sudo singularity build ct7.9-py3.8.sif ct7.9-py3.8.def
+
+%post
+
+    #==============================================================================
+
+    VERSION=3.8.1
+
+    # ========================= Install Python 3.8.1 =============================
+    wget https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz && \
+    tar -xf Python-${VERSION}.tgz && \
+    cd Python-${VERSION} && \
+    ./configure --enable-optimizations && \
+    make -j $(nproc) && \
+    make altinstall
+    
+    ln -s /usr/local/bin/python3.8 /usr/local/bin/python
+    ln -s /usr/local/bin/pip3.8 /usr/local/bin/pip
+
+    pip install --upgrade pip
+    
+    rm -rf /Python-${VERSION}*

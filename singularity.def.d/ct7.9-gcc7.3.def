@@ -1,0 +1,30 @@
+Bootstrap: docker
+From: centos:centos7.9.2009
+
+# COMMAND BUILD 
+# $ sudo singularity build ct7.9-gcc7.3.sif ct7.9-gcc7.3.def
+
+%post
+   
+    yum -y groupinstall 'Development tools'  && \
+    yum -y install wget which openssl-devel bzip2-devel libffi-devel 
+
+    wget http://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-7.3.0/gcc-7.3.0.tar.gz && \
+    tar zxf gcc-7.3.0.tar.gz && \
+    cd gcc-7.3.0 && \
+    ./contrib/download_prerequisites && \
+    ./configure --disable-multilib --enable-languages=c,c++ \
+    --prefix=/home/projects/50000043/apacsc29/.local && \
+    make -j $(nproc) && \
+    make install
+
+    rm -rf /gcc-7.3.0*
+    #==============================================================================
+
+    # yum install -y centos-release-scl
+    # yum install -y devtoolset-7-gcc*
+    # scl enable devtoolset-7 bash
+    # ln -s /opt/rh/devtoolset-7/root/usr/bin/gcc usr/bin/gcc
+    # ln -s /opt/rh/devtoolset-7/root/usr/bin/g++ usr/bin/g++
+
+    # echo 'source scl_source enable devtoolset-7' >> ~/.bashrc

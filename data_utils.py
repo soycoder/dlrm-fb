@@ -1278,6 +1278,15 @@ if __name__ == "__main__":
     parser.add_argument("--data-set", type=str, default="kaggle")  # or terabyte
     parser.add_argument("--raw-data-file", type=str, default="")
     parser.add_argument("--processed-data-file", type=str, default="")
+    parser.add_argument(
+        "--dataset-multiprocessing",
+        action="store_true",
+        default=False,
+        help="The Kaggle dataset can be multiprocessed in an environment \
+                        with more than 7 CPU cores and more than 20 GB of memory. \n \
+                        The Terabyte dataset can be multiprocessed in an environment \
+                        with more than 24 CPU cores and at least 1 TB of memory.",
+    )
     args = parser.parse_args()
 
     loadDataset(
@@ -1288,5 +1297,6 @@ if __name__ == "__main__":
         "train",
         args.raw_data_file,
         args.processed_data_file,
-        args.memory_map
+        args.memory_map,
+        args.dataset_multiprocessing
     )
